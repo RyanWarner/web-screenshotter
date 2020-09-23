@@ -1,4 +1,5 @@
 const playwright = require('playwright-aws-lambda')
+const queryString = require('query-string')
 const config = require('./config')
 
 module.exports = async (urlWithQueryparams) => {
@@ -35,13 +36,20 @@ const buildUri = ({ queryStringParameters = {} }) => {
     title = "No Title, Yet!",
     width,
     height,
-  } = queryStringParameters;
+  } = queryStringParameters
 
-  const dimensions = width && height ? `&width=${width}&height=${height}` : ''
+  const params = {
+    width,
+    height,
+    title,
+    id
+  }
+
+  const urlParamString = queryString.stringify(params)
 
   return {
     id,
-    path: `${url}?id=${id}&title=${title}${dimensions}`
+    path: `${url}?${urlParamString}`
   }
 }
 
