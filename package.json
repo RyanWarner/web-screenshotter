@@ -1,0 +1,19 @@
+{
+  "name": "image-grabber",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "gray-matter": "^4.0.2",
+    "https": "^1.0.0",
+    "minimist": "^1.2.5",
+    "playwright": "^1.4.1",
+    "playwright-aws-lambda": "^0.6.0",
+    "playwright-core": "^1.4.1"
+  }
+}
