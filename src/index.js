@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const matter = require('gray-matter')
 const getScreenshot = require('./get-screenshot')
+const getPaths = require('./get-paths')
 const config = require('./config')
 
 const chalk = require('chalk')
@@ -26,23 +27,7 @@ const args = require('minimist')(process.argv.slice(2), {
   }
 })
 
-const inputPath = path.join(process.cwd(), args.input)
-const outputPath = path.join(process.cwd(), args.output)
-
-const inputExists = fs.existsSync(inputPath)
-const outputExists = fs.existsSync(outputPath)
-
-if (inputExists && outputExists) {
-  console.log(`${chalk.green('✔')} Input/output paths exist`)
-} else {
-  if (!inputExists) {
-    console.log(`${chalk.red('✗')} Input path "${args.input}" does not exist`)
-  }
-
-  if (!outputExists) {
-    console.log(`${chalk.red('✗')} Output path "${args.output}" does not exist`)
-  }
-}
+const { inputPath, outputPath } = getPaths(args)
 
 async function processFile(filepath) {
   const content = fs.readFileSync(filepath, 'utf8')
@@ -71,8 +56,6 @@ async function processFile(filepath) {
   const writePath = path.join(outputPath, outputName)
   const writeExists = fs.existsSync(writePath)
 
-  // console.log(filepath)
-  // console.log(`exists: [${writeExists}] ${writePath}`)
   if (imageName !== outputName)
     console.warn(
       `[warning] [${outputName}] does not match image name [${imageName}]`,
@@ -122,4 +105,4 @@ function processFiles() {
   })
 }
 
-if (inputExists && outputExists) processFiles(inputPath)
+processFiles(inputPath)
