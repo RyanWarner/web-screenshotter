@@ -5,27 +5,32 @@ const config = require('./config')
 module.exports = async (urlWithQueryparams) => {
   try {
     const uri = buildUri(urlWithQueryparams)
-    console.log('uri', uri.path)
 
     const browser = await playwright.launchChromium({ headless: true })
     const context = await browser.newContext()
     const page = await context.newPage()
     await page.setViewportSize({
-      width: 1920,
-      height: 1080
+      width: config.width,
+      height: 630,
+      // deviceScaleFactor: 2
     })
     await page.goto(uri.path)
 
-    await page.waitForSelector('body')
+    await page.waitForSelector('#social-card')
     const boundingRect = await page.evaluate(getBoundingSize, uri)
-    const screenshotBuffer = await page.screenshot({ clip: boundingRect })
+    const screenshotBuffer = await page.screenshot({
+      type: config.extension,
+      clip: boundingRect
+    })
     await browser.close()
+
+    // TODO: Return just the buffer to pass to sharp for compression
     const base64Image = screenshotBuffer.toString('base64')
 
     return base64Image
   } catch (error) {
     console.log(error)
-    return { error }
+    process.exit(0)
   }
 }
 

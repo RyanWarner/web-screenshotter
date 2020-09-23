@@ -53,7 +53,7 @@ async function processFile(filepath) {
 
   console.log('-----------------------------------------')
 
-  const outputName = `${nameArray[nameArray.length - 1]}.png`
+  const outputName = `${nameArray[nameArray.length - 1]}.${config.extension}`
   const imageArray = data.image ? data.image.split('/') : [outputName]
   const imageName = imageArray[imageArray.length - 1]
   const writePath = path.join(outputPath, outputName)

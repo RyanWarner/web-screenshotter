@@ -3,5 +3,8 @@ module.exports = {
   elementId: 'social-card',
   name: 'Ryan Warner',
   inputPath: 'content',
-  outputPath: 'images'
+  outputPath: 'images',
+  width: 1200,
+  height: 630,
+  extension: 'png' // png | jpeg
 }
