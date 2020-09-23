@@ -6,7 +6,7 @@ module.exports = async (urlWithQueryparams) => {
     const uri = buildUri(urlWithQueryparams)
     console.log('uri', uri.path)
 
-    const browser = await playwright.launchChromium()
+    const browser = await playwright.launchChromium({ headless: true })
     const context = await browser.newContext()
     const page = await context.newPage()
     await page.setViewportSize({
@@ -15,7 +15,7 @@ module.exports = async (urlWithQueryparams) => {
     })
     await page.goto(uri.path)
 
-    await new Promise((resolve) => setTimeout(resolve, '100'))
+    await page.waitForSelector('body')
     const boundingRect = await page.evaluate(getBoundingSize, uri)
     const screenshotBuffer = await page.screenshot({ clip: boundingRect })
     await browser.close()

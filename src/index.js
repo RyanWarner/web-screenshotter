@@ -2,11 +2,12 @@ const fs = require('fs')
 const path = require('path')
 const matter = require('gray-matter')
 const getScreenshot = require('./get-screenshot')
+const config = require('./config')
 
 const args = require('minimist')(process.argv.slice(2), {
   default: {
-    input: 'content',
-    output: 'images',
+    input: config.inputPath,
+    output: config.outputPath,
     width: 1200,
     height: 630,
     tag: []
@@ -41,13 +42,13 @@ async function processFile(filepath) {
 
   const options = {
     queryStringParameters: {
-      name: args.name || 'Tony Alves',
+      name: args.name || config.name,
       title: args.title || data.title,
       width: args.width,
       height: args.height,
       tag: (args.tag && args.tag.length) || data.keywords || [],
       mode: args.mode,
-    },
+    }
   }
 
   console.log('-----------------------------------------')
@@ -105,7 +106,6 @@ async function processDir(dirpath) {
 
 function processFiles() {
   fs.stat(inputPath, function(err, stats) {
-    console.log(stats.isDirectory())
     if (stats.isDirectory()) {
       processDir(inputPath)
     } else if (stats.isFile()) {
