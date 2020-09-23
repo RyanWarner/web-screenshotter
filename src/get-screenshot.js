@@ -1,6 +1,8 @@
 const playwright = require('playwright-aws-lambda')
 const queryString = require('query-string')
 const config = require('./config')
+const chalk = require('chalk')
+const terminalError = chalk.bold.red
 
 module.exports = async (urlWithQueryparams) => {
   try {
@@ -29,6 +31,7 @@ module.exports = async (urlWithQueryparams) => {
 
     return base64Image
   } catch (error) {
+    console.log(terminalError('\nError getting screenshot: '))
     console.log(error)
     process.exit(0)
   }

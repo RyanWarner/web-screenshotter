@@ -4,6 +4,10 @@ const matter = require('gray-matter')
 const getScreenshot = require('./get-screenshot')
 const config = require('./config')
 
+const chalk = require('chalk')
+const terminalError = chalk.bold.red
+const terminalSuccess = chalk.bold.green
+
 const args = require('minimist')(process.argv.slice(2), {
   default: {
     input: config.inputPath,
@@ -26,9 +30,19 @@ const inputPath = path.join(process.cwd(), args.input)
 const outputPath = path.join(process.cwd(), args.output)
 
 const inputExists = fs.existsSync(inputPath)
-console.log(`exists: [${inputExists}] ${inputPath}`)
 const outputExists = fs.existsSync(outputPath)
-console.log(`exists: [${outputExists}] ${outputPath}`)
+
+if (inputExists && outputExists) {
+  console.log(`${chalk.green('✔')} Input/output paths exist`)
+} else {
+  if (!inputExists) {
+    console.log(`${chalk.red('✗')} Input path "${args.input}" does not exist`)
+  }
+
+  if (!outputExists) {
+    console.log(`${chalk.red('✗')} Output path "${args.output}" does not exist`)
+  }
+}
 
 async function processFile(filepath) {
   const content = fs.readFileSync(filepath, 'utf8')
@@ -51,41 +65,36 @@ async function processFile(filepath) {
     }
   }
 
-  console.log('-----------------------------------------')
-
   const outputName = `${nameArray[nameArray.length - 1]}.${config.extension}`
   const imageArray = data.image ? data.image.split('/') : [outputName]
   const imageName = imageArray[imageArray.length - 1]
   const writePath = path.join(outputPath, outputName)
   const writeExists = fs.existsSync(writePath)
 
-  console.log(filepath)
-  console.log(`exists: [${writeExists}] ${writePath}`)
+  // console.log(filepath)
+  // console.log(`exists: [${writeExists}] ${writePath}`)
   if (imageName !== outputName)
     console.warn(
       `[warning] [${outputName}] does not match image name [${imageName}]`,
     )
 
-  /*
-      Get the image from the uri
-      Make sure the file doesn't exist unless the -F (--Force)
-  */
+  // 
   if (!writeExists || args.F) {
+    // TODO: just use buffer instead of string
     let base64String = await getScreenshot(options)
 
     let base64Image = base64String.split('base64,').pop()
 
     fs.writeFile(writePath, base64Image, {encoding: 'base64'}, function(err) {
-      console.log('File created')
+      console.log(terminalSuccess('✔ File created'))
+      console.log('-----------------------------------------')
     })
 
-    console.log(`[writing] ${writePath}`)
-  } else {
-    console.log(`[exists] ${writePath}`)
-  }
+    let forced = args.F ? ' (forced update)' : ''
 
-  if (args.F && writeExists) {
-    console.warn(`[warning] ${imageName} was overwriting!`)
+    console.log(`${chalk.green('✔')} Creating image ${chalk.hex('#BAFFC5')(imageName)}${forced}...`)
+  } else {
+    console.log(`Skipping this image, it already exists.`)
   }
 }
 
@@ -98,9 +107,8 @@ function isValidExtension(filePath) {
 async function processDir(dirpath) {
   const dir = await fs.promises.opendir(dirpath)
   for await (const dirent of dir) {
-    console.log(dirent.name)
     if (isValidExtension(dirent.name))
-      processFile(path.join(dirpath, dirent.name))
+      await processFile(path.join(dirpath, dirent.name))
   }
 }
 
