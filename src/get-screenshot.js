@@ -1,4 +1,5 @@
-const playwright = require("playwright-aws-lambda")
+const playwright = require('playwright-aws-lambda')
+const config = require('./config')
 
 module.exports = async (urlWithQueryparams) => {
   try {
@@ -14,41 +15,41 @@ module.exports = async (urlWithQueryparams) => {
     })
     await page.goto(uri.path)
 
-    await new Promise((resolve) => setTimeout(resolve, "100"))
+    await new Promise((resolve) => setTimeout(resolve, '100'))
     const boundingRect = await page.evaluate(getBoundingSize, uri)
     const screenshotBuffer = await page.screenshot({ clip: boundingRect })
     await browser.close()
-    const base64Image = screenshotBuffer.toString("base64")
+    const base64Image = screenshotBuffer.toString('base64')
 
     return base64Image
   } catch (error) {
     console.log(error)
-    return { statusCode: error.statusCode || 500, body: error.message }
+    return { error }
   }
 }
 
 const buildUri = ({ queryStringParameters = {} }) => {
   const {
-    cardpath = "http://localhost:3000/ogimage",
-    id = "social-card",
+    url = config.url,
+    id = config.elementId,
     title = "No Title, Yet!",
     width,
     height,
   } = queryStringParameters;
 
-  const dimensions = width && height ? `&width=${width}&height=${height}` : "";
+  const dimensions = width && height ? `&width=${width}&height=${height}` : ''
 
   return {
     id,
-    path: `${cardpath}?id=${id}&title=${title}${dimensions}`,
+    path: `${url}?id=${id}&title=${title}${dimensions}`
   }
 }
 
 const getBoundingSize = (uri) => {
-  const cardBox = document.getElementById(uri.id)
-  if (typeof cardBox === "undefined" || cardBox === null)
+  const element = document.getElementById(uri.id)
+  if (typeof element === 'undefined' || element === null)
     return { x: 0, y: 0, width: 1920, height: 1080 }
 
-  const { x, y, width, height } = cardBox.getBoundingClientRect()
+  const { x, y, width, height } = element.getBoundingClientRect()
   return { x, y, width, height }
 }

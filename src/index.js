@@ -1,6 +1,5 @@
 const fs = require('fs')
 const path = require('path')
-const https = require('https')
 const matter = require('gray-matter')
 const getScreenshot = require('./get-screenshot')
 
