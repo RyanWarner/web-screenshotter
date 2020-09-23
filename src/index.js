@@ -19,8 +19,8 @@ const args = require('minimist')(process.argv.slice(2), {
     t: 'title',
     m: 'mode',
     F: 'force'
-  },
-});
+  }
+})
 
 const inputPath = path.join(process.cwd(), args.input)
 const outputPath = path.join(process.cwd(), args.output)
@@ -49,9 +49,9 @@ async function processFile(filepath) {
       tag: (args.tag && args.tag.length) || data.keywords || [],
       mode: args.mode,
     },
-  };
+  }
 
-  console.log('-----------------------------------------');
+  console.log('-----------------------------------------')
 
   const outputName = `${nameArray[nameArray.length - 1]}.png`
   const imageArray = data.image ? data.image.split('/') : [outputName]
@@ -59,50 +59,48 @@ async function processFile(filepath) {
   const writePath = path.join(outputPath, outputName)
   const writeExists = fs.existsSync(writePath)
 
-  console.log(filepath);
+  console.log(filepath)
   console.log(`exists: [${writeExists}] ${writePath}`)
   if (imageName !== outputName)
     console.warn(
       `[warning] [${outputName}] does not match image name [${imageName}]`,
-    );
-  // console.log(data);
+    )
 
   /*
       Get the image from the uri
       Make sure the file doesn't exist unless the -F (--Force)
   */
   if (!writeExists || args.F) {
-    // const file = fs.createWriteStream(writePath)
     let base64String = await getScreenshot(options)
 
-    let base64Image = base64String.split(';base64,').pop()
+    let base64Image = base64String.split('base64,').pop()
 
     fs.writeFile(writePath, base64Image, {encoding: 'base64'}, function(err) {
-      console.log('File created');
+      console.log('File created')
     })
 
-    console.log(`[writing] ${writePath}`);
+    console.log(`[writing] ${writePath}`)
   } else {
-    console.log(`[exists] ${writePath}`);
+    console.log(`[exists] ${writePath}`)
   }
 
   if (args.F && writeExists) {
-    console.warn(`[warning] ${imageName} was overwriting!`);
+    console.warn(`[warning] ${imageName} was overwriting!`)
   }
 }
 
 function isValidExtension(filePath) {
-  const fArray = filePath.split('.');
-  const extension = fArray[fArray.length - 1];
-  return ['md', 'mdx'].includes(extension);
+  const fArray = filePath.split('.')
+  const extension = fArray[fArray.length - 1]
+  return ['md', 'mdx'].includes(extension)
 }
 
 async function processDir(dirpath) {
-  const dir = await fs.promises.opendir(dirpath);
+  const dir = await fs.promises.opendir(dirpath)
   for await (const dirent of dir) {
-    console.log(dirent.name);
+    console.log(dirent.name)
     if (isValidExtension(dirent.name))
-      processFile(path.join(dirpath, dirent.name));
+      processFile(path.join(dirpath, dirent.name))
   }
 }
 
@@ -112,9 +110,9 @@ function processFiles() {
     if (stats.isDirectory()) {
       processDir(inputPath)
     } else if (stats.isFile()) {
-      if (isValidExtension(inputPath)) processFile(inputPath);
+      if (isValidExtension(inputPath)) processFile(inputPath)
     }
-  });
+  })
 }
 
-if (inputExists && outputExists) processFiles(inputPath);
+if (inputExists && outputExists) processFiles(inputPath)
