@@ -4,9 +4,9 @@ const config = require('./config')
 const chalk = require('chalk')
 const terminalError = chalk.bold.red
 
-module.exports = async (urlWithQueryparams) => {
+module.exports = async (options) => {
   try {
-    const uri = buildUri(urlWithQueryparams)
+    const uri = buildUri(options)
 
     const browser = await playwright.launchChromium({ headless: true })
     const context = await browser.newContext()

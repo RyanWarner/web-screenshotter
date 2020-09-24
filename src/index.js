@@ -3,55 +3,44 @@ const path = require('path')
 const matter = require('gray-matter')
 const getScreenshot = require('./get-screenshot')
 const getPaths = require('./get-paths')
-const config = require('./config')
+const defaults = require('./config')
 
 const chalk = require('chalk')
 const terminalError = chalk.bold.red
 const terminalSuccess = chalk.bold.green
 
 const args = require('minimist')(process.argv.slice(2), {
-  default: {
-    input: config.inputPath,
-    output: config.outputPath,
-    width: 1200,
-    height: 630,
-    tag: []
-  },
   alias: {
     i: 'input',
     o: 'output',
     n: 'name',
     t: 'title',
-    m: 'mode',
     F: 'force'
   }
 })
 
-const { inputPath, outputPath } = getPaths(args)
+const options = {
+  ...defaults,
+  ...args
+}
+
+const { inputPath, outputPath } = getPaths(options)
 
 async function processFile(filepath) {
   const content = fs.readFileSync(filepath, 'utf8')
-  const { data } = matter(content)
-  const nameArray = data.path ? data.path.split('/') : ['site-default']
+  const frontmatter = matter(content).data
+  
+  const nameArray = frontmatter.path
+    ? frontmatter.path.split('/')
+    : ['site-default']
 
-  if (Boolean(data.draft)) {
+  if (Boolean(frontmatter.draft)) {
     console.warn(`[skipping-draft] ${filepath}`)
     return
   }
 
-  const options = {
-    queryStringParameters: {
-      name: args.name || config.name,
-      title: args.title || data.title,
-      width: args.width,
-      height: args.height,
-      tag: (args.tag && args.tag.length) || data.keywords || [],
-      mode: args.mode,
-    }
-  }
-
-  const outputName = `${nameArray[nameArray.length - 1]}.${config.extension}`
-  const imageArray = data.image ? data.image.split('/') : [outputName]
+  const outputName = `${nameArray[nameArray.length - 1]}.${options.extension}`
+  const imageArray = frontmatter.image ? frontmatter.image.split('/') : [outputName]
   const imageName = imageArray[imageArray.length - 1]
   const writePath = path.join(outputPath, outputName)
   const writeExists = fs.existsSync(writePath)
@@ -64,7 +53,8 @@ async function processFile(filepath) {
   // 
   if (!writeExists || args.F) {
     // TODO: just use buffer instead of string
-    let base64String = await getScreenshot(options)
+    const optionsWithFrontmatter = Object.assign({}, options, frontmatter)
+    let base64String = await getScreenshot(optionsWithFrontmatter)
 
     let base64Image = base64String.split('base64,').pop()
 
