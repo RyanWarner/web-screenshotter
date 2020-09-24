@@ -8,7 +8,7 @@ Currently the primary purpose is to create open-graph images from MDX files.
 
 - Turn this into an NPM package
 - Support JSON in addition to MDX
-- Example & tutorial
+- Examples & tutorials for different use cases
 
 ## Credits
 
