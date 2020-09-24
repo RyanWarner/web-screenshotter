@@ -37,26 +37,15 @@ module.exports = async (options) => {
   }
 }
 
-const buildUri = ({ queryStringParameters = {} }) => {
-  const {
-    url = config.url,
-    id = config.elementId,
-    title = "No Title, Yet!",
-    width,
-    height,
-  } = queryStringParameters
+const buildUri = (options) => {
+  const { url, elementId } = options
 
-  const params = {
-    width,
-    height,
-    title,
-    id
-  }
+  const urlParamString = queryString.stringify(options)
 
-  const urlParamString = queryString.stringify(params)
+  console.log('urlParamString', urlParamString)
 
   return {
-    id,
+    id: elementId,
     path: `${url}?${urlParamString}`
   }
 }

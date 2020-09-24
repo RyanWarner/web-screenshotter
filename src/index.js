@@ -53,6 +53,8 @@ async function processFile(filepath) {
   // 
   if (!writeExists || args.F) {
     // TODO: just use buffer instead of string
+    // TODO: terminal params should have priority over frontmatter
+    // TODO: test arrays
     const optionsWithFrontmatter = Object.assign({}, options, frontmatter)
     let base64String = await getScreenshot(optionsWithFrontmatter)
 
