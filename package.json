@@ -7,7 +7,7 @@
     "start": "node ./src -F",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Ryan Warner (https://rw.codes)",
   "license": "ISC",
   "dependencies": {
     "chalk": "^4.1.0",
